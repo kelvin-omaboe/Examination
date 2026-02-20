@@ -10,7 +10,7 @@
       frequency: { type: "number", default: 0.14 },
       speed: { type: "number", default: 0.45 },
       uvSpeedX: { type: "number", default: 0.006 },
-      uvSpeedY: { type: "number", default: 0.003 }
+      uvSpeedY: { type: "number", default: 0.003 },
     },
 
     init: function () {
@@ -30,7 +30,12 @@
       }
 
       var mesh = this.el.getObject3D("mesh");
-      if (!mesh || !mesh.geometry || !mesh.geometry.attributes || !mesh.geometry.attributes.position) {
+      if (
+        !mesh ||
+        !mesh.geometry ||
+        !mesh.geometry.attributes ||
+        !mesh.geometry.attributes.position
+      ) {
         return;
       }
 
@@ -84,7 +89,7 @@
 
     remove: function () {
       this.el.removeEventListener("object3dset", this.onMeshSet);
-    }
+    },
   });
 
   // Fits imported glTF models to target dimensions while preserving proportions.
@@ -96,7 +101,7 @@
       centerX: { type: "boolean", default: true },
       centerZ: { type: "boolean", default: true },
       alignGround: { type: "boolean", default: true },
-      groundOffset: { type: "number", default: 0 }
+      groundOffset: { type: "number", default: 0 },
     },
 
     init: function () {
@@ -148,7 +153,9 @@
       }
 
       // Use the smallest candidate so the model always fits inside requested bounds.
-      var uniformScale = scaleCandidates.length ? Math.min.apply(Math, scaleCandidates) : 1;
+      var uniformScale = scaleCandidates.length
+        ? Math.min.apply(Math, scaleCandidates)
+        : 1;
       mesh.scale.multiplyScalar(uniformScale);
       mesh.updateMatrixWorld(true);
 
@@ -164,7 +171,11 @@
         mesh.position.z -= centerLocal.z;
       }
       if (this.data.alignGround) {
-        var groundProbeWorld = new THREE.Vector3(centerWorld.x, fittedBox.min.y, centerWorld.z);
+        var groundProbeWorld = new THREE.Vector3(
+          centerWorld.x,
+          fittedBox.min.y,
+          centerWorld.z,
+        );
         var groundProbeLocal = this.el.object3D.worldToLocal(groundProbeWorld);
         mesh.position.y -= groundProbeLocal.y;
       }
@@ -179,7 +190,7 @@
 
     remove: function () {
       this.el.removeEventListener("model-loaded", this.fit);
-    }
+    },
   });
 
   // Adds a dynamic water plane on top of pool models and softens baked water materials.
@@ -190,7 +201,7 @@
       roughness: { type: "number", default: 0.14 },
       metalness: { type: "number", default: 0.08 },
       waterHeightOffset: { type: "number", default: 0.03 },
-      segments: { type: "int", default: 60 }
+      segments: { type: "int", default: 60 },
     },
 
     init: function () {
@@ -220,14 +231,19 @@
         return;
       }
 
-      var materials = Array.isArray(obj3d.material) ? obj3d.material : [obj3d.material];
+      var materials = Array.isArray(obj3d.material)
+        ? obj3d.material
+        : [obj3d.material];
       for (var i = 0; i < materials.length; i++) {
         var mat = materials[i];
         if (!mat) {
           continue;
         }
         mat.transparent = true;
-        mat.opacity = Math.min(typeof mat.opacity === "number" ? mat.opacity : 1, 0.15);
+        mat.opacity = Math.min(
+          typeof mat.opacity === "number" ? mat.opacity : 1,
+          0.15,
+        );
         mat.depthWrite = false;
         if (mat.color) {
           mat.color.set("#77d0f2");
@@ -295,12 +311,16 @@
           "; segmentsWidth: " +
           this.data.segments +
           "; segmentsHeight: " +
-          this.data.segments
+          this.data.segments,
       );
       waterEl.setAttribute("rotation", "-90 0 0");
       waterEl.setAttribute(
         "position",
-        centerLocal.x.toFixed(3) + " " + waterY.toFixed(3) + " " + centerLocal.z.toFixed(3)
+        centerLocal.x.toFixed(3) +
+          " " +
+          waterY.toFixed(3) +
+          " " +
+          centerLocal.z.toFixed(3),
       );
       waterEl.setAttribute(
         "material",
@@ -312,11 +332,11 @@
           this.data.metalness +
           "; transparent: true; opacity: " +
           this.data.opacity +
-          "; side: double"
+          "; side: double",
       );
       waterEl.setAttribute(
         "water-surface",
-        "amplitude: 0.035; frequency: 2.6; speed: 1.08; uvSpeedX: 0.03; uvSpeedY: 0.02"
+        "amplitude: 0.035; frequency: 2.6; speed: 1.08; uvSpeedX: 0.03; uvSpeedY: 0.02",
       );
       waterEl.setAttribute("shadow", "receive: true");
 
@@ -337,6 +357,6 @@
         this.waterEl.parentNode.removeChild(this.waterEl);
       }
       this.waterEl = null;
-    }
+    },
   });
 })();
